@@ -6,6 +6,10 @@ const useCupList = (size, idx) => {
     if (idx >= 0) {
       getCups()
     }
+    else {
+      setCups([new Array(size).fill({ full: false })])
+      setRemained(2)
+    }
     function getCups() {
       let newList = []
       for (let i = 0; i < size; i++) {
@@ -17,7 +21,7 @@ const useCupList = (size, idx) => {
     }
   }, [idx, remained])
 
-  return { cups: cups[0], remained }
+  return { cups: cups[0], remained, fullIndex:idx }
 }
 
 const CupContainer = (props) => {
@@ -37,16 +41,16 @@ const CupContainer = (props) => {
 }
 
 const Cup = (props) => {
-  const { full, setFull, idx } = props
+  const { full, setFull, idx, fullIndex } = props
   return (
-    <div className={`cup cup-small ${full ? 'full' : ''}`} onClick={e => full ? setFull(idx - 1) : setFull(idx)}>250 ml</div>
+    <div className={`cup cup-small ${full ? 'full' : ''}`} onClick={e => (full&&idx===fullIndex) ? setFull(idx - 1) : setFull(idx)}>250 ml</div>
   )
 
 }
 const Cups = (props) => {
   const { size, setRemained } = props
   const [idx, setIdx] = React.useState()
-  const { cups, remained } = useCupList(size, idx)
+  const { cups, remained, fullIndex } = useCupList(size, idx)
   const setFull = (idx) => setIdx(idx)
   React.useEffect(() => {
     setRemained(`${remained}`)
@@ -55,7 +59,7 @@ const Cups = (props) => {
     <div className="cups">
       {
         cups.map((cup, index) => (
-          <Cup idx={index} key={index} full={cup.full} setFull={setFull} />
+          <Cup idx={index} key={index} full={cup.full} fullIndex={fullIndex} setFull={setFull} />
         ))
       }
     </div>
